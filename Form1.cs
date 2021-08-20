@@ -14,6 +14,10 @@ namespace SCReader
         public string selectedCard = string.Empty;
         public string readercontent = string.Empty;
         public bool IsStart { get; set; }
+
+
+        IMonitorFactory monitorFactory;
+        ISCardMonitor monitor;
         public Form1()
         {
             InitializeComponent();
@@ -33,10 +37,7 @@ namespace SCReader
         {
             List<string> devices = new List<string>();
             string devicelist = string.Empty;
-            devices.Add("Test1");
-            devices.Add("Test2");
-
-            /*
+             
             var contextFactory = ContextFactory.Instance;
             using (var context = contextFactory.Establish(SCardScope.System))
             {
@@ -46,33 +47,44 @@ namespace SCReader
                 {
                     devicelist = devicelist + "\t" + readerName;
                     devices.Add(readerName.Trim());
-                  
                 }
-
             }
-            */
-
             comboBox1.DataSource = new BindingSource(devices, null);
             textBox1.Text = devicelist;
         }
 
         private void btnConnectReader_Click(object sender, EventArgs e)
         {
+
+
+
+
             //readcard();
             if (IsStart)
             {
                 IsStart = false;
-
+                btnConnectReader.Text = "Start";
+                monitor.Cancel();
+                monitor.Dispose();
             }
             else
             {
-                IsStart = true;
+                if (string.IsNullOrEmpty(comboBox1.Text))
+                {
+                    MessageBox.Show("Please select card.");
+
+                    return;
+                }
+                selectedCard = comboBox1.Text;
+
+                IsStart = true; btnConnectReader.Text = "Stop";
+                StartMonitoring();
             }
             
 
         }
         delegate void SetTextCallback(string text);
-
+        delegate void SetStartCallback(bool v);
         private void SetText(string text)
         {
             // InvokeRequired required compares the thread ID of the
@@ -88,14 +100,30 @@ namespace SCReader
                 this.textBox1.Text = text;
             }
         }
+        private void SetStart(bool v)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.btnDetectcard.InvokeRequired)
+            {
+                SetStartCallback d = new SetStartCallback(SetStart);
+                this.Invoke(d, new object[] { v });
+            }
+            else
+            {
+                this.btnDetectcard.Enabled= v;
+            }
+        }
         private void readcard()
         {
-            using (var ctx = ContextFactory.Instance.Establish(SCardScope.System))
+            try
             {
-                 
-                try
+                using (var ctx = ContextFactory.Instance.Establish(SCardScope.System))
                 {
-                    using (var reader = ctx.ConnectReader("HID Global OMNIKEY 3x21 Smart Card Reader 0", SCardShareMode.Shared, SCardProtocol.Any))
+                    //"HID Global OMNIKEY 3x21 Smart Card Reader 0"
+
+                    using (var reader = ctx.ConnectReader(selectedCard, SCardShareMode.Shared, SCardProtocol.Any))
                     {
                         var cardAtr = reader.GetAttrib(SCardAttribute.AtrString);
                         //Console.WriteLine("ATR: {0}", BitConverter.ToString(cardAtr));
@@ -104,24 +132,20 @@ namespace SCReader
                         //textBox1.Text += BitConverter.ToString(cardAtr);
                         SetText("connected;" + BitConverter.ToString(cardAtr));
                     }
-                }
-                catch (Exception ex)
-                {
-                    SetText("Error:" + ex.Message);
+
 
                 }
+            }
+            catch (Exception ex)
+            {
+                SetText("Error:" + ex.Message);
 
             }
         }
 
         private void btnDetectcard_Click(object sender, EventArgs e)
         {
-            //StartMonitoring();
-            //var monitorFactory = MonitorFactory.Instance;
-            //var monitor = monitorFactory.Create(SCardScope.System);
-            //monitor.CardInserted += Monitor_CardInserted;
-            //monitor.CardRemoved += Monitor_CardRemoved;
-            //monitor.Start("HID Global OMNIKEY 3x21 Smart Card Reader 0");
+             
 
 
 
@@ -129,13 +153,15 @@ namespace SCReader
 
         private void Monitor_CardRemoved(object sender, CardStatusEventArgs e)
         {
-            btnDetectcard.Enabled = false;
+            SetStart(false);
+            //btnDetectcard.Enabled = false;
             SetText("Card removed.. Please insert");
         }
 
         private void Monitor_CardInserted(object sender, CardStatusEventArgs e)
         {
-            btnDetectcard.Enabled = true;
+            SetStart(true);
+            //btnDetectcard.Enabled = true;
             readcard();
 
         }
@@ -160,11 +186,11 @@ namespace SCReader
 
         private void StartMonitoring()
         {
-            IMonitorFactory monitorFactory = MonitorFactory.Instance;
-            ISCardMonitor monitor = monitorFactory.Create(SCardScope.System);
+             monitorFactory = MonitorFactory.Instance;
+             monitor = monitorFactory.Create(SCardScope.System);
             monitor.CardInserted += Monitor_CardInserted;
             monitor.CardRemoved += Monitor_CardRemoved;
-            monitor.Start("HID Global OMNIKEY 3x21 Smart Card Reader 0");
+            monitor.Start(selectedCard);//"HID Global OMNIKEY 3x21 Smart Card Reader 0"
             readcard();
         }
 
