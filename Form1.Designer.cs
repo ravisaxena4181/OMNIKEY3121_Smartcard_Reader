@@ -29,90 +29,102 @@ namespace SCReader
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnAllDevices = new System.Windows.Forms.Button();
             this.btnConnectReader = new System.Windows.Forms.Button();
             this.btnDetectcard = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btnExit = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
-            // 
-            // btnAllDevices
-            // 
-            this.btnAllDevices.Location = new System.Drawing.Point(28, 46);
-            this.btnAllDevices.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.btnAllDevices.Name = "btnAllDevices";
-            this.btnAllDevices.Size = new System.Drawing.Size(141, 28);
-            this.btnAllDevices.TabIndex = 0;
-            this.btnAllDevices.Text = "List All Devices";
-            this.btnAllDevices.UseVisualStyleBackColor = true;
-            this.btnAllDevices.Click += new System.EventHandler(this.btnAllDevices_Click);
             // 
             // btnConnectReader
             // 
-            this.btnConnectReader.Location = new System.Drawing.Point(212, 46);
-            this.btnConnectReader.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnConnectReader.Location = new System.Drawing.Point(478, 20);
+            this.btnConnectReader.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.btnConnectReader.Name = "btnConnectReader";
-            this.btnConnectReader.Size = new System.Drawing.Size(141, 28);
+            this.btnConnectReader.Size = new System.Drawing.Size(211, 29);
             this.btnConnectReader.TabIndex = 0;
-            this.btnConnectReader.Text = "Connect Reader";
+            this.btnConnectReader.Text = "Start";
             this.btnConnectReader.UseVisualStyleBackColor = true;
             this.btnConnectReader.Click += new System.EventHandler(this.btnConnectReader_Click);
             // 
             // btnDetectcard
             // 
-            this.btnDetectcard.Location = new System.Drawing.Point(376, 46);
-            this.btnDetectcard.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnDetectcard.Location = new System.Drawing.Point(478, 597);
+            this.btnDetectcard.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.btnDetectcard.Name = "btnDetectcard";
-            this.btnDetectcard.Size = new System.Drawing.Size(141, 28);
+            this.btnDetectcard.Size = new System.Drawing.Size(211, 44);
             this.btnDetectcard.TabIndex = 0;
-            this.btnDetectcard.Text = "Detect Card";
+            this.btnDetectcard.Text = "Write To Card";
             this.btnDetectcard.UseVisualStyleBackColor = true;
+            this.btnDetectcard.Click += new System.EventHandler(this.btnDetectcard_Click);
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(28, 137);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox1.Location = new System.Drawing.Point(41, 89);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(491, 196);
+            this.textBox1.Size = new System.Drawing.Size(734, 447);
             this.textBox1.TabIndex = 1;
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(418, 370);
-            this.btnExit.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnExit.Location = new System.Drawing.Point(697, 597);
+            this.btnExit.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(99, 28);
+            this.btnExit.Size = new System.Drawing.Size(148, 44);
             this.btnExit.TabIndex = 0;
             this.btnExit.Text = "Close";
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(41, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(113, 21);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "List Of Readers";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(170, 20);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(301, 29);
+            this.comboBox1.TabIndex = 4;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(534, 408);
+            this.ClientSize = new System.Drawing.Size(853, 659);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.btnDetectcard);
             this.Controls.Add(this.btnConnectReader);
             this.Controls.Add(this.btnExit);
-            this.Controls.Add(this.btnAllDevices);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Font = new System.Drawing.Font("Calibri", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.Name = "Form1";
             this.Text = "Smart Card Reader";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button btnAllDevices;
         private System.Windows.Forms.Button btnConnectReader;
         private System.Windows.Forms.Button btnDetectcard;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 
