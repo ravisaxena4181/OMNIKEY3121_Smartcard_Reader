@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using PCSC;
 using PCSC.Monitoring;
+using PCSC.Iso7816;
+
 
 namespace SCReader
 {
     /// <summary>
     /// https://github.com/danm-de/pcsc-sharp
+    /// https://csharp.hotexamples.com/examples/PCSC.Iso7816/IsoReader/-/php-isoreader-class-examples.html
     /// </summary>
     public partial class Form1 : Form
     {
@@ -145,22 +148,44 @@ namespace SCReader
 
         private void btnDetectcard_Click(object sender, EventArgs e)
         {
-             
 
+            var contextFactory = ContextFactory.Instance;
+            using (var ctx = contextFactory.Establish(SCardScope.System))
+            {
+                using (var isoReader = new IsoReader(ctx, comboBox1.Text, SCardShareMode.Shared, SCardProtocol.Any, false))
+                {
+
+                    var apdu = new CommandApdu(IsoCase.Case2Short, isoReader.ActiveProtocol)
+                    {
+                        CLA = 0x00, // Class
+                        Instruction = InstructionCode.GetChallenge,
+                        P1 = 0x00, // Parameter 1
+                        P2 = 0x00, // Parameter 2
+                        Le = 0x08 // Expected length of the returned data
+                    };
+
+                    var response = isoReader.Transmit(apdu);
+                    SetText(string.Format("SW1 SW2 = {0:X2} {1:X2}", response.SW1, response.SW2));
+                    
+                    //Console.WriteLine("SW1 SW2 = {0:X2} {1:X2}", response.SW1, response.SW2);
+                    // ..
+                }
+
+            }
 
 
         }
 
         private void Monitor_CardRemoved(object sender, CardStatusEventArgs e)
         {
-            SetStart(false);
+            //SetStart(false);
             //btnDetectcard.Enabled = false;
             SetText("Card removed.. Please insert");
         }
 
         private void Monitor_CardInserted(object sender, CardStatusEventArgs e)
         {
-            SetStart(true);
+            //SetStart(true);
             //btnDetectcard.Enabled = true;
             readcard();
 
@@ -172,7 +197,7 @@ namespace SCReader
         private void Form1_Load(object sender, EventArgs e)
         {
             //StartMonitoring();
-            btnDetectcard.Enabled = false;
+            //btnDetectcard.Enabled = false;
             try
             {
                 ListAllDevices();
