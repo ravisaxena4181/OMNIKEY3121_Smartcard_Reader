@@ -6,6 +6,7 @@ using PCSC.Monitoring;
 using PCSC.Iso7816;
 using System.Text;
 using System.Globalization;
+using System.Linq;
 
 namespace SCReader
 {
@@ -26,6 +27,101 @@ namespace SCReader
         {
             InitializeComponent();
         }
+        private void writetocard() {
+            byte[] DATA_TO_WRITE = {
+            0x0F, 0x0E, 0x0D, 0x0C, 0x0B, 0x0A, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
+        };
+            using (var ctx = ContextFactory.Instance.Establish(SCardScope.System))
+            {
+
+                using (var isoReader = new IsoReader(
+                   context: ctx,
+                   readerName: comboBox1.Text,
+                   mode: SCardShareMode.Shared,
+                   protocol: SCardProtocol.Any))
+                {
+                    // Build a GET CHALLENGE command 
+                    var apdu = new CommandApdu(IsoCase.Case4Extended, SCardProtocol.T0)
+                    {
+                        CLA = 0x00, // Class
+                        Instruction = InstructionCode.WriteBinary,
+                        P1 = 0x00, // Parameter 1
+                        P2 = 0x00, // Parameter 2
+                        Le = DATA_TO_WRITE.Length,// 0x08, // Expected length of the returned data
+                        Data    = DATA_TO_WRITE,
+                    };
+
+                    SetText(string.Format( "Send APDU with \"GET CHALLENGE\" command: {0}",
+                        BitConverter.ToString(apdu.ToArray())));
+
+                    var response = isoReader.Transmit(apdu);
+
+                    SetText(string.Format("SW1 SW2 = {0:X2} {1:X2}",
+                        response.SW1, response.SW2));
+
+                    if (!response.HasData)
+                    {
+                        SetText(string.Format("No data. (Card does not understand \"GET CHALLENGE\")"));
+                    }
+                    else
+                    {
+                        var data = response.GetData();
+                        SetText(string.Format("Challenge: {0}", BitConverter.ToString(data)));
+                    }
+                }
+
+            }
+
+        }
+
+        private void btnDetectcard_Click(object sender, EventArgs e)
+        {
+            writetocard();
+            return;
+            using (var context = ContextFactory.Instance.Establish(SCardScope.System))
+            {
+                
+                using (var rfidReader = context.ConnectReader(comboBox1.Text, SCardShareMode.Shared, SCardProtocol.Any))
+                {
+                    var apdu = new CommandApdu(IsoCase.Case2Short, rfidReader.Protocol)
+                    {
+                        CLA = 0xFF,
+                        Instruction = InstructionCode.GetData,
+                        P1 = 0x00,
+                        P2 = 0x00,
+                        Le = 0 // We don't know the ID tag size
+                    };
+
+                    using (rfidReader.Transaction(SCardReaderDisposition.Leave))
+                    {
+                        Console.WriteLine("Retrieving the UID .... ");
+
+                        var sendPci = SCardPCI.GetPci(rfidReader.Protocol);
+                        var receivePci = new SCardPCI(); // IO returned protocol control information.
+
+                        var receiveBuffer = new byte[256];
+                        var command = apdu.ToArray();
+
+                        var bytesReceived = rfidReader.Transmit(
+                            sendPci, // Protocol Control Information (T0, T1 or Raw)
+                            command, // command APDU
+                            command.Length,
+                            receivePci, // returning Protocol Control Information
+                            receiveBuffer,
+                            receiveBuffer.Length); // data buffer
+
+                        var responseApdu =
+                            new ResponseApdu(receiveBuffer, bytesReceived, IsoCase.Case2Short, rfidReader.Protocol);
+                        Console.WriteLine("SW1: {0:X2}, SW2: {1:X2}\nUid: {2}",
+                            responseApdu.SW1,
+                            responseApdu.SW2,
+                            responseApdu.HasData ? BitConverter.ToString(responseApdu.GetData()) : "No uid received");
+                    }
+                }
+            }
+             
+        }
+        #region events
 
         private void btnExit_Click(object sender, EventArgs e)
         {
@@ -130,11 +226,21 @@ namespace SCReader
                     using (var reader = ctx.ConnectReader(selectedCard, SCardShareMode.Shared, SCardProtocol.Any))
                     {
                         var cardAtr = reader.GetAttrib(SCardAttribute.AtrString);
+                        var rstatus = reader.GetStatus();
+
+                        Console.WriteLine("Reader {0} connected with protocol {1} in state {2}",
+                            rstatus.GetReaderNames().FirstOrDefault(),
+                            rstatus.Protocol,
+                            rstatus.State);
+                        SetText(string.Format("Reader {0} connected with protocol {1} in state {2}",
+                            rstatus.GetReaderNames().FirstOrDefault(),
+                            rstatus.Protocol,
+                            rstatus.State));
                         //Console.WriteLine("ATR: {0}", BitConverter.ToString(cardAtr));
                         //Console.ReadKey();
 
                         //textBox1.Text += BitConverter.ToString(cardAtr);
-                        SetText("connected;" + BitConverter.ToString(cardAtr));
+                        SetText(string.Format("ATR: {0}", BitConverter.ToString(cardAtr)));
                     }
 
 
@@ -146,8 +252,60 @@ namespace SCReader
 
             }
         }
+        private void readrecords()
+        {
+            try
+            {
+                var contextFactory = ContextFactory.Instance;
+                using (var ctx = contextFactory.Establish(SCardScope.System))
+                {
+                    using (var isoReader = new IsoReader(ctx, comboBox1.Text, SCardShareMode.Shared, SCardProtocol.Any, false))
+                    {
 
-        private void btnDetectcard_Click(object sender, EventArgs e)
+                        var apdu = new CommandApdu(IsoCase.Case4Extended, SCardProtocol.T0)
+                        {
+                            CLA = 0x00, // Class
+                            Instruction = InstructionCode.WriteBinary,
+                            P1 = 0x00, // Parameter 1
+                            P2 = 0x00, // Parameter 2
+                            Le = 0, // Expected length of the returned data
+                            //Le = 0x00 // Expected length of the returned data
+                            Data = Encoding.ASCII.GetBytes("4F6C6976696572204D616973FFFF07913344026414F8FFFFFFFFFFFF"),
+                        };
+
+                        var response = isoReader.Transmit(apdu);
+                        SetText(string.Format("SW1 SW2 = {0:X2} {1:X2}", response.SW1, response.SW2));
+                        if (response.SW1 == 0x90 && response.SW2 == 0x00)
+                        {
+                            if (response.HasData)
+                            {
+                                string dtresp = Encoding.UTF8.GetString(response.GetData());
+                                SetText(string.Format("data = {0:X2},lenght ={1:X2}", dtresp, response.PciCount));
+                                string outstring = Encoding.ASCII.GetString(response[0].FullApdu);
+
+                                SetText(string.Format("data = {0:X2}", outstring));
+                            }
+
+                        }
+                        else
+                        {
+                            SetText("No data found.");
+                        }
+
+                        //Console.WriteLine("SW1 SW2 = {0:X2} {1:X2}", response.SW1, response.SW2);
+                        // ..
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void checkcard()
         {
             try
             {
@@ -169,14 +327,17 @@ namespace SCReader
 
                         var response = isoReader.Transmit(apdu);
                         SetText(string.Format("SW1 SW2 = {0:X2} {1:X2}", response.SW1, response.SW2));
-                        if (response.SW1 == 144 && response.SW2 == 00)
+                        if (response.SW1 == 0x90 && response.SW2 == 0x00)
                         {
                             if (response.HasData)
                             {
                                 string dtresp = Encoding.UTF8.GetString(response.GetData());
-                                SetText(string.Format("data = {0:X2}", dtresp));
+                                SetText(string.Format("data = {0:X2},lenght ={1:X2}", dtresp, response.PciCount));
+                                string outstring = Encoding.ASCII.GetString(response[0].FullApdu);
+
+                                SetText(string.Format("data = {0:X2}", outstring));
                             }
-                            //SetText(string.Format("data = {0:X2}", response.GetData()));
+
                         }
                         else
                         {
@@ -194,9 +355,8 @@ namespace SCReader
 
                 MessageBox.Show(ex.Message);
             }
-
-
         }
+
 
         private void case2()
         {
@@ -290,5 +450,11 @@ namespace SCReader
         {
 
         }
+
+        private void btnReadfromCard_Click(object sender, EventArgs e)
+        {
+            checkcard();
+        } 
+        #endregion
     }
 }

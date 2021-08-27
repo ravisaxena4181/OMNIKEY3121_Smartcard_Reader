@@ -35,6 +35,7 @@ namespace SCReader
             this.btnExit = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.btnReadfromCard = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnConnectReader
@@ -50,10 +51,10 @@ namespace SCReader
             // 
             // btnDetectcard
             // 
-            this.btnDetectcard.Location = new System.Drawing.Point(478, 597);
+            this.btnDetectcard.Location = new System.Drawing.Point(445, 403);
             this.btnDetectcard.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.btnDetectcard.Name = "btnDetectcard";
-            this.btnDetectcard.Size = new System.Drawing.Size(211, 44);
+            this.btnDetectcard.Size = new System.Drawing.Size(159, 44);
             this.btnDetectcard.TabIndex = 0;
             this.btnDetectcard.Text = "Write To Card";
             this.btnDetectcard.UseVisualStyleBackColor = true;
@@ -65,12 +66,13 @@ namespace SCReader
             this.textBox1.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(734, 447);
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox1.Size = new System.Drawing.Size(734, 297);
             this.textBox1.TabIndex = 1;
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(697, 597);
+            this.btnExit.Location = new System.Drawing.Point(627, 403);
             this.btnExit.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(148, 44);
@@ -84,7 +86,7 @@ namespace SCReader
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(41, 23);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(113, 21);
+            this.label1.Size = new System.Drawing.Size(92, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "List Of Readers";
             // 
@@ -93,15 +95,27 @@ namespace SCReader
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Location = new System.Drawing.Point(170, 20);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(301, 29);
+            this.comboBox1.Size = new System.Drawing.Size(301, 23);
             this.comboBox1.TabIndex = 4;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
+            // btnReadfromCard
+            // 
+            this.btnReadfromCard.Location = new System.Drawing.Point(278, 403);
+            this.btnReadfromCard.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.btnReadfromCard.Name = "btnReadfromCard";
+            this.btnReadfromCard.Size = new System.Drawing.Size(159, 44);
+            this.btnReadfromCard.TabIndex = 5;
+            this.btnReadfromCard.Text = "Read from Card";
+            this.btnReadfromCard.UseVisualStyleBackColor = true;
+            this.btnReadfromCard.Click += new System.EventHandler(this.btnReadfromCard_Click);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(853, 659);
+            this.ClientSize = new System.Drawing.Size(787, 467);
+            this.Controls.Add(this.btnReadfromCard);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
@@ -125,6 +139,7 @@ namespace SCReader
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button btnReadfromCard;
     }
 }
 

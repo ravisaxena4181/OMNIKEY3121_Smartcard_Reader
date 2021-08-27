@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCReader", "SCReader.csproj", "{E9F433E0-5E26-4124-B4BF-9B518FA38AAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "..\TestConsole\TestConsole.csproj", "{C696F57A-19CA-460A-85CF-3D19AA1DAD7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E9F433E0-5E26-4124-B4BF-9B518FA38AAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9F433E0-5E26-4124-B4BF-9B518FA38AAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9F433E0-5E26-4124-B4BF-9B518FA38AAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C696F57A-19CA-460A-85CF-3D19AA1DAD7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C696F57A-19CA-460A-85CF-3D19AA1DAD7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C696F57A-19CA-460A-85CF-3D19AA1DAD7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C696F57A-19CA-460A-85CF-3D19AA1DAD7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
